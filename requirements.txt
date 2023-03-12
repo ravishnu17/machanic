@@ -8,7 +8,7 @@ filelock==3.9.0
 fonttools==4.37.4
 idna==3.4
 kiwisolver==1.4.4
-matplotlib==3.6.0
+matplotlib
 messagebox==0.1.0
 mysql-connector-python==8.0.31
 numpy==1.23.3
