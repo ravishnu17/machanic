@@ -20,6 +20,11 @@ def add_role(data:List[schema.Role], db:Session=Depends(db.get_db)):
     db.commit()
     return {"detail":"Data added successfully"}
 
+@app.get('/viewroles')
+def viewRoles(db:Session= Depends(db.get_db)):
+    data= db.query(modal.Role).all()
+    return data
+
 @app.post('/adduser')
 def add_user(data:schema.AddUser, db:Session= Depends(db.get_db)):
     checkUser= db.query(modal.Users).filter(modal.Users.phone_no== data.phone_no, modal.Users.role_id == data.role_id ).first()
@@ -49,7 +54,18 @@ def login(data:OAuth2PasswordRequestForm= Depends(), db:Session= Depends(db.get_
 
     return {"token_type":"bearer","access_token":token}
 
-@app.get('/verifyuser')
-def GetData( current_user= Depends(auth.verify_token)):
-    return current_user
+@app.get('/getuser')
+def GetData(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+    data = db.query(modal.Users).filter(modal.Users.user_id == current_user['user_id']).first()
+    
+    return data
 
+@app.put('/updateuser')
+def UpdateUser(data:schema.EditUser, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+    query= db.query(modal.Users).filter(modal.Users.user_id == current_user['user_id'])
+
+    if query.first():
+        query.update(data.dict(), synchronize_session= False)
+        db.commit()
+        
+        return {"detail":"Data updated successfully"}

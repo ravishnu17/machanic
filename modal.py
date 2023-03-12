@@ -32,6 +32,8 @@ class Users(base):
     vehicle_make= Column(Integer)
     vehicle_brand= Column(String)
     driving_license_no= Column(String)
+    description= Column(String)
+    status= Column(Boolean, server_default='true')
     kyc= Column(String)
     location= Column(String)
     createdAt= Column(DateTime, nullable=False, server_default=func.now())

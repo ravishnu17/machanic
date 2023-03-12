@@ -16,6 +16,25 @@ class AddUser(BaseModel):
     vehicle_no:Optional[str]
     vehicle_make:Optional[int]
     vehicle_brand:Optional[str]
+    description:Optional[str]
+    driving_license_no:Optional[str]
+    kyc:Optional[str]
+    location:Optional[str]
+    
+class EditUser(BaseModel):
+    name:str
+    phone_no:int
+    alternate_phone_no:Optional[int]
+    street:str
+    town_city:str
+    district:str
+    state:str
+    pincode:int
+    vehicle_name:Optional[str]
+    vehicle_no:Optional[str]
+    vehicle_make:Optional[int]
+    vehicle_brand:Optional[str]
+    description:Optional[str]
     driving_license_no:Optional[str]
     kyc:Optional[str]
     location:Optional[str]
