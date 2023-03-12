@@ -4,7 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from Auth.config import secret
 
 
-db_url= f'postgresql://{secret.dbuser}:{secret.db_password}@{secret.host}:{secret.port}/{secret.dbname}'
+db_url= f'postgresql://{secret.db_url}'
+
 
 try:
     engine= create_engine(db_url)

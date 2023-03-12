@@ -6,6 +6,7 @@ class Secrets(BaseSettings):
     host:str
     port:int
     db_password:str
+    db_url:str
     
     class Config:
         env_file= ".env"
