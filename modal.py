@@ -44,11 +44,13 @@ class Membership(base):
     membership_name= Column(String, nullable= False)
     Membership_price= Column(Float, nullable= False)
     validity= Column(Integer, nullable= False)
+    validity_type= Column(String, nullable= False, server_default='days')
     customer_count= Column(Integer, nullable=False)
     createdAt= Column(DateTime, nullable=False, server_default=func.now())
 
 class machanic_membership(base):
     __tablename__= "tbl_machanic_membership"
+    
     id= Column(Integer, primary_key=True, nullable= False)
     user_id= Column(Integer,ForeignKey("tbl_users.user_id", ondelete="CASCADE"), nullable=False)
     membership_id= Column(Integer,ForeignKey("tbl_membership.id"), nullable=False)

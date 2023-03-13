@@ -65,5 +65,8 @@ class ViewMembership(BaseModel):
         
 class BuyMembership(BaseModel):
     membership_id:int
+    user_id:Optional[int]
     paid_amount:float
     purchase_date:date
+    payment_status:Optional[bool]
+    expires_on:Optional[date]

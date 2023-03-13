@@ -19,6 +19,6 @@ def verify_token(token= Depends(token)):
     try:
         token_data= jwt.decode(token, secret_key, algorithms=[algorithm])
         return token_data
-    except JWTError():
+    except JWTError as Error:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized access")
 
