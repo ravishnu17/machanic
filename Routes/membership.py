@@ -22,3 +22,7 @@ def Get_membership(db:Session= Depends(db.get_db)):
     data= db.query(modal.Membership).all()
     
     return data
+
+@app.post('/buymembership')
+def buyMembership(data:schema.BuyMembership, db:Session= Depends(db.get_db)):
+    return "Developing"

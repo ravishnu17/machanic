@@ -39,9 +39,9 @@ def add_user(data:schema.AddUser, db:Session= Depends(db.get_db)):
 
     return {"detail":"Registered successfully"}
 
-@app.post('/login')
-def login(data:OAuth2PasswordRequestForm= Depends(), db:Session= Depends(db.get_db)):
-    checkUser= db.query(modal.Users).filter(modal.Users.phone_no == data.username).first()
+@app.post('/login/{id}')
+def login(id:int,data:OAuth2PasswordRequestForm= Depends(), db:Session= Depends(db.get_db)):
+    checkUser= db.query(modal.Users).filter(modal.Users.phone_no == data.username, modal.Users.role_id== id).first()
     if not checkUser:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
@@ -69,3 +69,13 @@ def UpdateUser(data:schema.EditUser, db:Session= Depends(db.get_db), current_use
         db.commit()
         
         return {"detail":"Data updated successfully"}
+
+@app.delete('/deleteuser')
+def DeleteUser(data:schema.EditUser, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+    query= db.query(modal.Users).filter(modal.Users.user_id == current_user['user_id'])
+
+    if query.first():
+        query.delete(synchronize_session= False)
+        db.commit()
+        
+        return {"detail":"Data Deleted successfully"}

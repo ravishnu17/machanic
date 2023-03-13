@@ -1,5 +1,6 @@
 from pydantic import  BaseModel
 from typing import Optional
+from datetime import date
 
 class AddUser(BaseModel):
     role_id:int
@@ -61,3 +62,8 @@ class ViewMembership(BaseModel):
 
     class Config:
         orm_mode= True
+        
+class BuyMembership(BaseModel):
+    membership_id:int
+    paid_amount:float
+    purchase_date:date
