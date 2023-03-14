@@ -59,4 +59,24 @@ class machanic_membership(base):
     paid_amount= Column(Float, nullable= False)
     purchase_date= Column(Date, nullable=False, server_default=func.now())
     expires_on= Column(Date, nullable=False)
+    
+    
+class Services(base):
+    __tablename__ = "tbl_services"
+    
+    id= Column(Integer, primary_key=True, nullable= False)
+    user_id= Column(Integer,ForeignKey("tbl_users.user_id", ondelete="CASCADE"), nullable=False)
+    user_name= Column(String, nullable= False)
+    machanic_id= Column(Integer,ForeignKey("tbl_users.user_id", ondelete="CASCADE"), nullable=False)
+    macahnic_name= Column(String, nullable= True)
+    call_center_id= Column(Integer,ForeignKey("tbl_users.user_id", ondelete="CASCADE"), nullable=True)
+    attender_name= Column(String, nullable= True)
+    requested_date= Column(Date, nullable=False)
+    service_type= Column(String, nullable=True)
+    service_location= Column(String, nullable= False)
+    comments= Column(String,nullable= True)
+    Approved= Column(Boolean, nullable= False, server_default='false')
+    service_status= Column(String, nullable= True)
+    service_cost= Column(Float, nullable= True)
+    
 

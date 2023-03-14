@@ -44,12 +44,44 @@ def buyMembership(data:schema.BuyMembership, db:Session= Depends(db.get_db), cur
     
     get_user= db.query(modal.machanic_membership).filter(modal.machanic_membership.user_id == current_user['user_id'])
     if(get_user.first()):
-        return "update"
+        data.payment_status=True
+        data.user_id= current_user['user_id']
+        data.expires_on= date.today()+ timedelta(days=getMembershipData.validity)
+        data.membership_name=getMembershipData.membership_name
+        get_user.update(data.dict(), synchronize_session= False)
+        db.commit()
+        return {"detail":"Membership upgraded"}
     else:
         data.payment_status=True
         data.user_id= current_user['user_id']
         data.expires_on= date.today()+ timedelta(days=getMembershipData.validity)
-        print(data)
-        return "Add"
+        data.membership_name=getMembershipData.membership_name
+        memberData= modal.machanic_membership(**data.dict())
+        db.add(memberData)
+        db.commit()
+        
+        return {"detail":"Membership added successfully"}
+    
+@app.get('/viewallmachanicmembership')
+def getMachanicMembership(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+    data= db.query(modal.machanic_membership).all()
+    
+    return data
+
+@app.get('/viewmachanicmembership')
+def getMachanicMembership(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+    data= db.query(modal.machanic_membership).filter(modal.machanic_membership.user_id == current_user['user_id']).all()
+    
+    return data
+
+@app.delete('/cancelmachanicmembership')
+def getMachanicMembership( db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+    data= db.query(modal.machanic_membership).filter(modal.machanic_membership.user_id == current_user['user_id'])
+    if data.first():
+        data.delete(synchronize_session=False)
+        db.commit()
+        return {"detail":"Membership is removed"}
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
         
            

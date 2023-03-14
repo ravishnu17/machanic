@@ -65,8 +65,31 @@ class ViewMembership(BaseModel):
         
 class BuyMembership(BaseModel):
     membership_id:int
+    membership_name:Optional[str]
     user_id:Optional[int]
     paid_amount:float
     purchase_date:date
     payment_status:Optional[bool]
     expires_on:Optional[date]
+    
+class FindMachanic(BaseModel):
+    town_city:str
+    district:str
+    state:str
+    pincode:int
+    
+class Service(BaseModel):
+    user_id:Optional[int]
+    user_name : Optional[str]
+    machanic_id:int
+    macahnic_name: str
+    call_center_id:Optional[int]
+    attender_name: Optional[str]
+    requested_date: date
+    service_type: str
+    service_location: str
+    comments:Optional[str]
+    Approved:Optional[bool]= False
+    service_status: Optional[str]= 'Requested'
+    service_cost: Optional[float]=0
+    

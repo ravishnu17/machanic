@@ -48,7 +48,7 @@ def login(id:int,data:OAuth2PasswordRequestForm= Depends(), db:Session= Depends(
     if not utils.verify(data.password, checkUser.password):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Incorrect password")
     
-    temp_data={'user_id':checkUser.user_id,"name":checkUser.name}
+    temp_data={'user_id':checkUser.user_id,"name":checkUser.name, 'role_id':checkUser.role_id}
 
     token= auth.Create_token(temp_data)
 
@@ -57,6 +57,9 @@ def login(id:int,data:OAuth2PasswordRequestForm= Depends(), db:Session= Depends(
 @app.get('/getuser')
 def GetData(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
     data = db.query(modal.Users).filter(modal.Users.user_id == current_user['user_id']).first()
+    membership= db.query(modal.machanic_membership).filter(modal.machanic_membership.user_id == current_user['user_id']).first()
+    if membership:
+        data.membership_details= membership
     
     return data
 
@@ -79,3 +82,14 @@ def DeleteUser(data:schema.EditUser, db:Session= Depends(db.get_db), current_use
         db.commit()
         
         return {"detail":"Data Deleted successfully"}
+    
+
+#for admin
+@app.get('/getalluser/{usertype}')
+def getAllUser(usertype:int,db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+    if(current_user['user_id']==1):
+        data= db.query(modal.Users).filter(modal.Users.role_id !=1, modal.Users.role_id == usertype).all()
+        
+        return data
+    else:
+        raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail="Forbidden") 
