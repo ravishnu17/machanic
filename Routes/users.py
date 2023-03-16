@@ -36,7 +36,8 @@ def viewRoles(db:Session= Depends(db.get_db)):
 @app.post('/adduser')
 def add_user(data:schema.AddUser,response:Response, db:Session= Depends(db.get_db)):
     checkUser= db.query(modal.Users).filter(modal.Users.phone_no== data.phone_no, modal.Users.role_id == data.role_id ).first()
-
+    print("received data",data)
+    print("filter in db", checkUser.__dict__)
     if checkUser:
         response.status_code=status.HTTP_409_CONFLICT
         return {
