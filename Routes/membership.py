@@ -46,6 +46,7 @@ def buyMembership(data:schema.BuyMembership, db:Session= Depends(db.get_db), cur
     if(get_user.first()):
         data.payment_status=True
         data.user_id= current_user['user_id']
+        data.purchase_date= date.today()
         data.expires_on= date.today()+ timedelta(days=getMembershipData.validity)
         data.membership_name=getMembershipData.membership_name
         get_user.update(data.dict(), synchronize_session= False)
@@ -70,7 +71,7 @@ def getMachanicMembership(db:Session= Depends(db.get_db), current_user= Depends(
 
 @app.get('/viewmachanicmembership')
 def getMachanicMembership(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
-    data= db.query(modal.machanic_membership).filter(modal.machanic_membership.user_id == current_user['user_id']).all()
+    data= db.query(modal.machanic_membership).filter(modal.machanic_membership.user_id == current_user['user_id']).first()
     
     return data
 
@@ -80,7 +81,7 @@ def getMachanicMembership( db:Session= Depends(db.get_db), current_user= Depends
     if data.first():
         data.delete(synchronize_session=False)
         db.commit()
-        return {"detail":"Membership is removed"}
+        return {"detail":"Membership is cancelled"}
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
         

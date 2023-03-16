@@ -30,7 +30,7 @@ def upgrade() -> None:
     sa.Column('service_type', sa.String(), nullable=True),
     sa.Column('service_location', sa.String(), nullable=False),
     sa.Column('comments', sa.String(), nullable=True),
-    sa.Column('Approved', sa.Boolean(), server_default='false', nullable=False),
+    sa.Column('approved', sa.Boolean(), server_default='false', nullable=False),
     sa.Column('service_status', sa.String(), nullable=True),
     sa.Column('service_cost', sa.Float(), nullable=True),
     sa.ForeignKeyConstraint(['call_center_id'], ['tbl_users.user_id'], ondelete='CASCADE'),

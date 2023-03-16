@@ -75,8 +75,9 @@ class Services(base):
     service_type= Column(String, nullable=True)
     service_location= Column(String, nullable= False)
     comments= Column(String,nullable= True)
-    Approved= Column(Boolean, nullable= False, server_default='false')
+    approved= Column(Boolean, nullable= False, server_default='false')
     service_status= Column(String, nullable= True)
     service_cost= Column(Float, nullable= True)
+    service_rating = Column(Integer, nullable= True)
     
 

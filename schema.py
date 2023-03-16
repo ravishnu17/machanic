@@ -68,7 +68,7 @@ class BuyMembership(BaseModel):
     membership_name:Optional[str]
     user_id:Optional[int]
     paid_amount:float
-    purchase_date:date
+    purchase_date:Optional[date]
     payment_status:Optional[bool]
     expires_on:Optional[date]
     
@@ -89,7 +89,8 @@ class Service(BaseModel):
     service_type: str
     service_location: str
     comments:Optional[str]
-    Approved:Optional[bool]= False
+    approved:Optional[bool]= False
     service_status: Optional[str]= 'Requested'
     service_cost: Optional[float]=0
+    service_rating:Optional[int]
     
