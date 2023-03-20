@@ -10,28 +10,6 @@ app= APIRouter(
     prefix='/user'
 )
 
-@app.post('/addrole')
-def add_role(data:List[schema.Role], db:Session=Depends(db.get_db)):
-    roleData= []
-    for role in data:
-        temp= modal.Role(**role.dict())
-        roleData.append(temp)
-    db.add_all(roleData)
-    db.commit()
-    return {
-        "status_code":200,
-        "response_status":"success",
-        "Response_data":"Roles are added successfully"
-        }
-
-@app.get('/viewroles')
-def viewRoles(db:Session= Depends(db.get_db)):
-    data= db.query(modal.Role).all()
-    return {
-        "status_code":200,
-        "response_status":"success",
-        "Response_data":data
-        }
 
 @app.post('/adduser')
 def add_user(data:schema.AddUser,response:Response, db:Session= Depends(db.get_db)):
@@ -124,23 +102,4 @@ def DeleteUser(db:Session= Depends(db.get_db), current_user= Depends(auth.verify
             "status_code":200,
             "response_status":"success",
             "Response_data":"User deleted successfully"
-        }
-    
-
-#for admin
-@app.get('/getalluser/{usertype}')
-def getAllUser(usertype:int, response:Response, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
-    if(current_user['user_id']==1):
-        data= db.query(modal.Users).filter(modal.Users.role_id !=1, modal.Users.role_id == usertype).all()
-        return {
-            "status_code":200,
-            "response_status":"success",
-            "Response_data":data
-        }
-    else:
-        response.status_code=status.HTTP_401_UNAUTHORIZED
-        return {
-            "status_code":401,
-            "response_status":"failed",
-            "Response_data":"Forbidden"
         }

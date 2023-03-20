@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 import schema, db, modal
 from Auth import auth
 from sqlalchemy.orm import Session
@@ -10,33 +10,17 @@ app= APIRouter(
     prefix='/membership'
 )
 
-@app.post('/addmembership')
-def AddMembership(data:schema.Membership, db:Session= Depends(db.get_db)):
-    membership_data= modal.Membership(**data.dict())
-    db.add(membership_data)
-    db.commit()
-    db.refresh(membership_data)
 
-    return membership_data
 
-@app.get('/viewmembership', response_model=List[schema.ViewMembership])
+@app.get('/viewmembership', response_model=schema.ViewMembership)
 def Get_membership(db:Session= Depends(db.get_db)):
     data= db.query(modal.Membership).all()
     
-    return data
-
-@app.put('/updatemembership/{id}')
-def AddMembership(id:int,data:schema.Membership, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
-    if(current_user['user_id']==1):
-        membership_data= db.query(modal.Membership).filter(modal.Membership.id ==id )
-        if membership_data.first():
-            membership_data.update(data.dict(), synchronize_session= False)
-            db.commit()
-            return {"detail":"Updated successfully"}
-        else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
-    else:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+    return {
+        "status_code":200,
+        "response_status":"success",
+        "Response_data":data
+        }
 
 @app.post('/buymembership')
 def buyMembership(data:schema.BuyMembership, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
@@ -51,7 +35,11 @@ def buyMembership(data:schema.BuyMembership, db:Session= Depends(db.get_db), cur
         data.membership_name=getMembershipData.membership_name
         get_user.update(data.dict(), synchronize_session= False)
         db.commit()
-        return {"detail":"Membership upgraded"}
+        return {
+            "status_code":200,
+            "response_status":"success",
+            "Response_data":"Membership upgraded"
+        }
     else:
         data.payment_status=True
         data.user_id= current_user['user_id']
@@ -61,28 +49,39 @@ def buyMembership(data:schema.BuyMembership, db:Session= Depends(db.get_db), cur
         db.add(memberData)
         db.commit()
         
-        return {"detail":"Membership added successfully"}
-    
-@app.get('/viewallmachanicmembership')
-def getMachanicMembership(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
-    data= db.query(modal.machanic_membership).all()
-    
-    return data
+        return {
+            "status_code":200,
+            "response_status":"success",
+            "Response_data":"Membership added successfully"
+        }
 
 @app.get('/viewmachanicmembership')
 def getMachanicMembership(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
     data= db.query(modal.machanic_membership).filter(modal.machanic_membership.user_id == current_user['user_id']).first()
     
-    return data
+    return {
+            "status_code":200,
+            "response_status":"success",
+            "Response_data":data
+        }
 
 @app.delete('/cancelmachanicmembership')
-def getMachanicMembership( db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+def getMachanicMembership(response:Response, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
     data= db.query(modal.machanic_membership).filter(modal.machanic_membership.user_id == current_user['user_id'])
     if data.first():
         data.delete(synchronize_session=False)
         db.commit()
-        return {"detail":"Membership is cancelled"}
+        return {
+            "status_code":200,
+            "response_status":"success",
+            "Response_data":"Membership is cancelled"
+        }
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
+        response.status_code=status.HTTP_404_NOT_FOUND
+        {
+            "status_code":404,
+            "response_status":"failed",
+            "Response_data":"Membership data not found"
+        }
         
            

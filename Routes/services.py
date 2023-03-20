@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 import db, modal, schema
 from Auth import auth
 from sqlalchemy.orm import Session
@@ -11,7 +11,7 @@ app= APIRouter(
 )
 
 @app.post('/findmachanic')
-def findMachanic(data:schema.FindMachanic, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+def findMachanic(data:schema.FindMachanic,response:Response, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
     get_machanic= db.query(modal.Users).filter(
         func.upper(modal.Users.town_city).contains(data.town_city.upper()),
         func.upper(modal.Users.district).contains(data.district.upper()),
@@ -27,9 +27,18 @@ def findMachanic(data:schema.FindMachanic, db:Session= Depends(db.get_db), curre
             del get_machanic[machanic[0]]
         
     if get_machanic:
-        return get_machanic
+        return {
+        "status_code": 200,
+        "response_status": "success",
+        "Response_data":get_machanic
+        }
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Machanic not found in this location")
+        response.status_code=status.HTTP_404_NOT_FOUND 
+        return{
+            "status_code": 404,
+            "response_status": "failed",
+            "Response_data":"Machanic not found in this location"
+            }
 
 @app.post('/addservice')
 def addService(data:schema.Service, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
@@ -41,40 +50,68 @@ def addService(data:schema.Service, db:Session= Depends(db.get_db), current_user
     db.commit()
     db.refresh(serviceData)
     
-    return {"detail":"service requested successfully"}
+    return { "status_code": 200,
+            "response_status": "success",
+            "Response_data":"service requested successfully"
+            }
 
 @app.get('/viewrequest')
-def ViewRequest(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+def ViewRequest(response:Response, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
     data= db.query(modal.Services).filter(modal.Services.machanic_id == current_user['user_id'], modal.Services.approved == False, modal.Services.service_status != "Cancelled").all()
     if data:
-        return data
+        return { 
+                "status_code": 200,
+                "response_status": "success",
+                "Response_data":data
+            }
     else:
-        raise HTTPException (status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
-
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return{
+            "status_code": 404,
+            "response_status": "failed",
+            "Response_data":"Request not found"
+        }
+        
 @app.put('/acceptrequest/{id}')
-def acceptRequest(id:int,db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+def acceptRequest(id:int, response:Response, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
     data= db.query(modal.Services).filter(modal.Services.machanic_id == current_user['user_id'],modal.Services.id == id)
     
     if data.first():
         data.update({"approved":True}, synchronize_session= False)
         db.commit()
-        return {"detail":"Request accepted"}
+        return {
+            "status_code": 200,
+            "response_status": "success",
+            "Response_data":"Request accepted"}
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
-    
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return{
+            "status_code": 404,
+            "response_status": "failed",
+            "Response_data":"Request not found"
+        }
+
 @app.put('/cancelrequest/{id}')
-def acceptRequest(id:int,db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+def acceptRequest(id:int,response:Response, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
     data= db.query(modal.Services).filter(modal.Services.machanic_id == current_user['user_id'],modal.Services.id == id)
     
     if data.first():
         data.update({"service_status":"Cancelled"}, synchronize_session= False)
         db.commit()
-        return {"detail":"Request Rejected"}
+        return {
+            "status_code": 200,
+            "response_status": "success",
+            "Response_data":"Request Rejected"}
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
- 
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return{
+            "status_code": 404,
+            "response_status": "failed",
+            "Response_data":"Request not found"
+        }
+        
 @app.get('/viewservicehistory')
-def GetServiceHistory(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+def GetServiceHistory(response:Response, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
     print(current_user['role_id'])
     if(current_user['role_id'] == 2):
         get_data= db.query(modal.Services).filter(modal.Services.machanic_id == current_user['user_id'],modal.Services.approved == True).all()
@@ -87,9 +124,18 @@ def GetServiceHistory(db:Session= Depends(db.get_db), current_user= Depends(auth
                 get_user= query.filter(modal.Users.user_id == data.user_id).first()
                 data.customer_phone_no = get_user.phone_no
                 data.machanic_phone_no = get_current_user.phone_no
-            return get_data   
+            return {
+                "status_code": 200,
+                "response_status": "success",
+                "Response_data":get_data
+                }   
         else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
+            response.status_code= status.HTTP_404_NOT_FOUND
+            return {
+                "status_code": 404,
+                "response_status": "failed",
+                "Response_data":"Data not found"
+            }
     else:
   
         get_data= db.query(modal.Services).filter(modal.Services.user_id == current_user['user_id']).all()
@@ -102,23 +148,41 @@ def GetServiceHistory(db:Session= Depends(db.get_db), current_user= Depends(auth
                 get_machanic= query.filter(modal.Users.user_id == data.machanic_id).first()
                 data.machanic_phone_no = get_machanic.phone_no
                 data.customer_phone_no = get_user.phone_no
-            return get_data   
+            return {
+                "status_code": 200,
+                "response_status": "success",
+                "Response_data":get_data
+                }     
         else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
-        
+            response.status_code= status.HTTP_404_NOT_FOUND
+            return {
+                "status_code": 404,
+                "response_status": "failed",
+                "Response_data":"Data not found"
+            }
+            
 @app.delete('/removerequest/{id}')
-def RemoveRequest(id:int,db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+def RemoveRequest(id:int,response:Response, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
     data= db.query(modal.Services).filter(modal.Services.user_id == current_user['user_id'],modal.Services.id == id)
     
     if data.first():
         data.delete(synchronize_session= False)
         db.commit()
-        return {"detail":"Service Cleared"}
+        return {
+            "status_code": 200,
+            "response_status": "success",
+            "Response_data":"Service Deleted"
+        }
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
+        response.status_code= status.HTTP_404_NOT_FOUND
+        return {
+            "status_code": 404,
+            "response_status": "failed",
+            "Response_data":"Request not found"
+        }
     
 @app.put('/updaterequest/{id}')
-def UpdateRequest(id:int, data:schema.Service, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
+def UpdateRequest(id:int, data:schema.Service, response:Response, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
     if(current_user['role_id'] == 2):
         serviceData= db.query(modal.Services).filter(modal.Services.id == id, modal.Services.machanic_id == current_user['user_id'])
     else:
@@ -128,7 +192,15 @@ def UpdateRequest(id:int, data:schema.Service, db:Session= Depends(db.get_db), c
     if serviceData.first():
         serviceData.update(data.dict(), synchronize_session= False)
         db.commit()
-        return {"detail":"Service updated"}
+        return {
+            "status_code": 200,
+            "response_status": "success",
+            "Response_data":"Service updated"
+        }
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
-    
+        response.status_code= status.HTTP_404_NOT_FOUND
+        return {
+            "status_code": 404,
+            "response_status": "failed",
+            "Response_data":"Request not found"
+        }

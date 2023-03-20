@@ -1,5 +1,5 @@
 from pydantic import  BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 
 class AddUser(BaseModel):
@@ -53,13 +53,21 @@ class Membership(BaseModel):
     validity:int
     customer_count:int
 
-class ViewMembership(BaseModel):
+class MembershipData(BaseModel):
     id:int
     membership_name:str
     Membership_price:float
     validity:int
     customer_count:int
 
+    class Config:
+        orm_mode= True
+        
+class ViewMembership(BaseModel):
+    status_code: int
+    response_status: str
+    Response_data:List[MembershipData]
+    
     class Config:
         orm_mode= True
         
