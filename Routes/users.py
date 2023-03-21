@@ -57,11 +57,7 @@ def login(id:int,response:Response,data:OAuth2PasswordRequestForm= Depends(), db
     
     temp_data={'user_id':checkUser.user_id,"name":checkUser.name, 'role_id':checkUser.role_id}
     token= auth.Create_token(temp_data)
-    return {
-        "status_code":200,
-        "response_status":"success",
-        "Response_data":{"token_type":"bearer","access_token":token}
-    }
+    return{"token_type":"bearer","access_token":token }
 
 @app.get('/getuser')
 def GetData(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
