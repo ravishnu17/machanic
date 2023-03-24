@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, UploadFile
 import schema, db, modal, utils
 from sqlalchemy.orm import Session
 from typing import List
@@ -99,3 +99,7 @@ def DeleteUser(db:Session= Depends(db.get_db), current_user= Depends(auth.verify
             "response_status":"success",
             "Response_data":"User deleted successfully"
         }
+        
+@app.post('/getimage')
+def Img(img:UploadFile):
+    return img
