@@ -6,7 +6,7 @@ from fastapi import Depends, status, HTTPException
 token= OAuth2PasswordBearer(tokenUrl='user/login/1')
 
 algorithm= 'HS256'
-secret_key= 'jhf438734jyhfbyuimnyghbgthbthnbnth'
+secret_key= 'jhf438734jyhfbyuimnyghbgthbthnbnth56782678KUHJKUEIHJEHO'
 minutes= 30
 
 def Create_token(data:dict):
@@ -20,5 +20,6 @@ def verify_token(token= Depends(token)):
         token_data= jwt.decode(token, secret_key, algorithms=[algorithm])
         return token_data
     except JWTError as Error:
+        print("err", Error)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized access")
 
