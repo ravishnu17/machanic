@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, UploadFile
 import schema, db, modal, utils
 from sqlalchemy.orm import Session
 from typing import List
@@ -57,7 +57,7 @@ def login(id:int,response:Response,data:OAuth2PasswordRequestForm= Depends(), db
     
     temp_data={'user_id':checkUser.user_id,"name":checkUser.name, 'role_id':checkUser.role_id}
     token= auth.Create_token(temp_data)
-    return{"token_type":"bearer","access_token":token }
+    return{"user_id":checkUser.user_id,"name":checkUser.name,"Role_id":checkUser.role_id,"token_type":"bearer","access_token":token }
 
 @app.get('/getuser')
 def GetData(db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
@@ -99,3 +99,7 @@ def DeleteUser(db:Session= Depends(db.get_db), current_user= Depends(auth.verify
             "response_status":"success",
             "Response_data":"User deleted successfully"
         }
+        
+@app.post('/getimage')
+def Img(img:UploadFile):
+    return img

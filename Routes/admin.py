@@ -39,8 +39,8 @@ def viewRoles(db:Session= Depends(db.get_db), current_user=  Depends(auth.verify
 
 @app.get('/getalluser/{usertype}')
 def getAllUser(usertype:int, response:Response, db:Session= Depends(db.get_db), current_user= Depends(auth.verify_token)):
-    if(current_user['user_id']==1):
-        data= db.query(modal.Users).filter(modal.Users.role_id !=1, modal.Users.role_id == usertype,   modal.Users.status == True).all()
+    if(current_user['role_id']==1):
+        data= db.query(modal.Users).filter(modal.Users.role_id !=1, modal.Users.role_id == usertype, modal.Users.status == True).all()
         return {
             "status_code":200,
             "response_status":"success",
