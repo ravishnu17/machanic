@@ -7,11 +7,11 @@ token= OAuth2PasswordBearer(tokenUrl='user/login/1')
 
 algorithm= 'HS256'
 secret_key= 'jhf438734jyhfbyuimnyghbgthbthnbnth'
-minutes= 30
+minutes= 60
 
 def Create_token(data:dict):
     expire_time= datetime.utcnow()+ timedelta(minutes=minutes)
-    data.update({'exp':expire_time})
+    # data.update({'exp':expire_time})
     token= jwt.encode(data,secret_key, algorithm=algorithm)
     return token
 
