@@ -77,7 +77,7 @@ def acceptRequest(id:int, response:Response, db:Session= Depends(db.get_db), cur
     data= db.query(modal.Services).filter(modal.Services.machanic_id == current_user['user_id'],modal.Services.id == id)
     
     if data.first():
-        data.update({"approved":True}, synchronize_session= False)
+        data.update({"approved":True,"service_status":"Accepted"}, synchronize_session= False)
         db.commit()
         return {
             "status_code": 200,
