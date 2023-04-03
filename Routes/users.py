@@ -7,7 +7,7 @@ from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 app= APIRouter(
     tags=['Users'],
-    prefix='/user'
+    prefix='/user',
 )
 
 
