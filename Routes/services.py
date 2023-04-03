@@ -20,11 +20,11 @@ def findMachanic(data:schema.FindMachanic,response:Response, db:Session= Depends
         modal.Users.role_id == 2
     ).order_by(modal.Users.user_id.desc()).all()
     
-    for machanic in enumerate(get_machanic):
-        check_plan=  db.query(modal.machanic_membership).filter(modal.machanic_membership.user_id == machanic[1].user_id ,modal.machanic_membership.expires_on<date.today()).first()
+    # for machanic in enumerate(get_machanic):
+    #     check_plan=  db.query(modal.machanic_membership).filter(modal.machanic_membership.user_id == machanic[1].user_id ,modal.machanic_membership.expires_on<date.today()).first()
         
-        if not check_plan:
-            del get_machanic[machanic[0]]
+    #     if not check_plan:
+    #         del get_machanic[machanic[0]]
         
     if get_machanic:
         return {
