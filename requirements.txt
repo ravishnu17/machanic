@@ -43,6 +43,7 @@ psycopg2
 pyasn1
 pycparser
 pydantic
+pydantic_settings
 pyparsing
 python-dateutil
 python-dotenv
